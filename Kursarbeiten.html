@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kursarbeiten</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f5f6fa;--card:#fff;--text:#1b1f2a;--muted:#8a90a2;--line:#e6e8f0;--done:#22c55e;--todo:#6366f1;--track:#e9ebf3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1117;--card:#181b24;--text:#eef0f6;--muted:#7d8497;--line:#262a37;--done:#34d399;--todo:#818cf8;--track:#222633}}
+:root[data-theme="dark"]{--bg:#0f1117;--card:#181b24;--text:#eef0f6;--muted:#7d8497;--line:#262a37;--done:#34d399;--todo:#818cf8;--track:#222633}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+main{max-width:520px;margin:0 auto;padding:28px 18px 48px}
+h1{font-size:26px;margin:0 0 4px;letter-spacing:-.02em}
+.sub{color:var(--muted);margin:0 0 22px;font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:16px;animation:rise .6s cubic-bezier(.2,.8,.2,1) both}
+.card:nth-of-type(2){animation-delay:.08s}.card:nth-of-type(3){animation-delay:.16s}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.chart{display:flex;align-items:center;gap:22px}
+svg{width:150px;height:150px;flex:none;transform:rotate(-90deg);border-radius:50%}
+circle{fill:none;stroke-width:32;transition:stroke-dasharray .9s cubic-bezier(.3,.8,.2,1),stroke-dashoffset .9s cubic-bezier(.3,.8,.2,1)}
+.legend{flex:1}
+.pct{font-size:40px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.pct small{font-size:18px;color:var(--muted);font-weight:500}
+.lab{color:var(--muted);font-size:13px;margin:4px 0 14px}
+.row{display:flex;align-items:center;gap:8px;font-size:14px;margin-top:6px}
+.dot{width:10px;height:10px;border-radius:50%}
+form{display:flex;gap:8px;flex-wrap:wrap}
+input[type=text],input[type=date]{font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:11px 13px;outline:none;transition:border-color .2s,box-shadow .2s}
+input:focus{border-color:var(--todo);box-shadow:0 0 0 3px color-mix(in srgb,var(--todo) 22%,transparent)}
+input[type=text]{flex:1 1 180px;min-width:0}
+input[type=date]{flex:1 1 130px}
+button.add{font:inherit;font-weight:600;border:0;border-radius:12px;padding:11px 18px;background:var(--todo);color:#fff;cursor:pointer;transition:transform .15s,filter .2s}
+button.add:hover{filter:brightness(1.08)}button.add:active{transform:scale(.95)}
+ul{list-style:none;margin:0;padding:0}
+li{display:flex;align-items:center;gap:13px;padding:13px 4px;border-bottom:1px solid var(--line);animation:in .45s cubic-bezier(.2,.8,.2,1) both;transition:opacity .3s,transform .3s}
+li:last-child{border-bottom:0}
+li.out{opacity:0;transform:translateX(30px)}
+@keyframes in{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+.chk{appearance:none;-webkit-appearance:none;width:24px;height:24px;border-radius:8px;border:2px solid var(--line);flex:none;cursor:pointer;display:grid;place-items:center;transition:background .25s,border-color .25s}
+.chk::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) scale(0);margin-top:-2px;transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.chk:checked{background:var(--done);border-color:var(--done);animation:pop .35s}
+.chk:checked::after{transform:rotate(45deg) scale(1)}
+@keyframes pop{50%{transform:scale(1.2)}}
+.t{flex:1;min-width:0}
+.name{font-weight:550;transition:color .3s;position:relative;display:inline-block;word-break:break-word}
+.name::after{content:"";position:absolute;left:0;top:55%;height:2px;width:100%;background:var(--muted);transform:scaleX(0);transform-origin:left;transition:transform .35s}
+li.done .name{color:var(--muted)}li.done .name::after{transform:scaleX(1)}
+.date{font-size:12px;color:var(--muted);margin-top:2px}
+.del{background:none;border:0;color:var(--muted);font-size:20px;cursor:pointer;padding:4px 8px;border-radius:8px;transition:color .2s,background .2s}
+.del:hover{color:#ef4444;background:var(--bg)}
+.empty{text-align:center;color:var(--muted);padding:22px 0 8px;font-size:14px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Kursarbeiten</h1>
+  <p class="sub">Trag ein, was ansteht – und hak ab, was geschafft ist.</p>
+
+  <section class="card chart">
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="16" pathLength="100" stroke="var(--track)" stroke-dasharray="100 100"/>
+      <circle id="todoC" cx="32" cy="32" r="16" pathLength="100" stroke="var(--todo)" stroke-dasharray="0 100"/>
+      <circle id="doneC" cx="32" cy="32" r="16" pathLength="100" stroke="var(--done)" stroke-dasharray="0 100"/>
+    </svg>
+    <div class="legend">
+      <div class="pct"><span id="pct">0</span><small>%</small></div>
+      <div class="lab">geschrieben</div>
+      <div class="row"><span class="dot" style="background:var(--done)"></span><span id="nDone">0</span>&nbsp;geschrieben</div>
+      <div class="row"><span class="dot" style="background:var(--todo)"></span><span id="nTodo">0</span>&nbsp;offen</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <form id="f">
+      <input type="text" id="n" placeholder="Fach, z. B. Mathe" maxlength="60" required autocomplete="off">
+      <input type="date" id="d" aria-label="Datum">
+      <button class="add" type="submit">Hinzufügen</button>
+    </form>
+  </section>
+
+  <section class="card">
+    <ul id="list"></ul>
+    <div class="empty" id="empty">Noch keine Kursarbeiten eingetragen.</div>
+  </section>
+</main>
+
+<script>
+const KEY="kursarbeiten-v1";
+let items=[];
+try{items=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){items=[]}
+if(!Array.isArray(items))items=[];
+const $=id=>document.getElementById(id);
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(items))}catch(e){}};
+const fmt=d=>d?new Date(d+"T00:00").toLocaleDateString("de-DE",{weekday:"short",day:"numeric",month:"long",year:"numeric"}):"";
+let shown=0,raf;
+function countTo(el,to){
+  cancelAnimationFrame(raf);const from=shown,t0=performance.now();
+  (function s(t){const k=Math.min(1,(t-t0)/800),e=1-Math.pow(1-k,3);
+    shown=Math.round(from+(to-from)*e);el.textContent=shown;if(k<1)raf=requestAnimationFrame(s)})(t0);
+}
+function chart(){
+  const n=items.length,d=items.filter(i=>i.done).length;
+  const p=n?d/n*100:0;
+  $("doneC").setAttribute("stroke-dasharray",p+" 100");
+  $("todoC").setAttribute("stroke-dasharray",(n?100-p:0)+" 100");
+  $("todoC").setAttribute("stroke-dashoffset",-p);
+  $("nDone").textContent=d;$("nTodo").textContent=n-d;
+  countTo($("pct"),Math.round(p));
+}
+function sorted(){
+  return [...items].sort((a,b)=>a.done-b.done||(a.date||"9").localeCompare(b.date||"9")||a.id-b.id);
+}
+const known=new Set();
+function render(){
+  const ul=$("list");ul.innerHTML="";
+  sorted().forEach(it=>{
+    const li=document.createElement("li");
+    li.className=it.done?"done":"";
+    if(known.has(it.id))li.style.animation="none";
+    known.add(it.id);
+    const c=document.createElement("input");c.type="checkbox";c.className="chk";c.checked=it.done;
+    c.setAttribute("aria-label",it.name+" geschrieben");
+    c.onchange=()=>{it.done=c.checked;li.classList.toggle("done",it.done);save();chart();setTimeout(render,450)};
+    const t=document.createElement("div");t.className="t";
+    const nm=document.createElement("span");nm.className="name";nm.textContent=it.name;
+    t.appendChild(nm);
+    if(it.date){const dd=document.createElement("div");dd.className="date";dd.textContent=fmt(it.date);t.appendChild(dd)}
+    const x=document.createElement("button");x.className="del";x.innerHTML="&times;";x.setAttribute("aria-label","Löschen");
+    x.onclick=()=>{li.classList.add("out");setTimeout(()=>{items=items.filter(i=>i.id!==it.id);save();render();chart()},300)};
+    li.append(c,t,x);ul.appendChild(li);
+  });
+  $("empty").style.display=items.length?"none":"block";
+}
+$("f").onsubmit=e=>{
+  e.preventDefault();
+  const name=$("n").value.trim();if(!name)return;
+  items.push({id:Date.now(),name,date:$("d").value,done:false});
+  $("n").value="";$("d").value="";save();render();chart();$("n").focus();
+};
+render();
+setTimeout(chart,250);
+</script>
+</body>
+</html>
